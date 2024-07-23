@@ -9,9 +9,13 @@ import Toolbar from "./toolbar";
 import Footer from "./footer";
 import { ActiveTool } from "../types";
 import ShapeSidebar from "./shape-sidebar";
+import FillColorSidebar from "./fill-color-sidebar";
 
 const Editor = () => {
   const [activeTool, setActiveTool] = useState<ActiveTool>("select");
+  const { init, editor } = useEditor();
+  const canvasRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const onChangeActiveTool = useCallback(
     (tool: ActiveTool) => {
@@ -28,9 +32,6 @@ const Editor = () => {
     },
     [activeTool]
   );
-  const { init } = useEditor();
-  const canvasRef = useRef(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = new fabric.Canvas(canvasRef.current, {
@@ -56,11 +57,22 @@ const Editor = () => {
           onChangeActiveTool={onChangeActiveTool}
         />
         <ShapeSidebar
+          editor={editor}
+          activeTool={activeTool}
+          onChangeActiveTool={onChangeActiveTool}
+        />
+        <FillColorSidebar
+          editor={editor}
           activeTool={activeTool}
           onChangeActiveTool={onChangeActiveTool}
         />
         <main className="bg-muted flex-1 overflow-auto relative flex flex-col">
-          <Toolbar />
+          <Toolbar
+            editor={editor}
+            activeTool={activeTool}
+            onChangeActiveTool={onChangeActiveTool}
+            key={JSON.stringify(editor?.canvas?.getActiveObject())}
+          />
           <div
             className="flex-1 h-[calc(100%-124px)] bg-muted"
             ref={containerRef}
