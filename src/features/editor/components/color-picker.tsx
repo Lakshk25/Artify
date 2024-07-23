@@ -8,7 +8,6 @@ interface ColorPickerProps {
 }
 
 export const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
-  console.log("col", colors);
   return (
     <div className="w-full space-y-4">
       {/* future params check console */}

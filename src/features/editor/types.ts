@@ -65,6 +65,13 @@ export interface Editor {
   strokeColor: string;
   strokeWidth: number;
   selectedObjects: fabric.Object[];
+  // not working some bug fix it later
+  // getActiveFillColor: () => string;
+  getActiveStrokeColor: () => string;
+}
+
+export interface EditorHookProps {
+  clearSelectionCallback?: () => void;
 }
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
@@ -112,3 +119,13 @@ export const TRIANGLE_OPTIONS = {
   height: 400,
   angle: 0,
 };
+
+export const selectionDependentTools = [
+  "fill",
+  "font",
+  "filter",
+  "opacity",
+  "remove-bg",
+  "stroke-color",
+  "stroke-width",
+];
