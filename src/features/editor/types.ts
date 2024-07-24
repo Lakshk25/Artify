@@ -1,3 +1,4 @@
+import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
 
 export const colors = [
@@ -20,6 +21,15 @@ export const colors = [
   material.brown["500"],
   material.blueGrey["500"],
   "transparent",
+];
+
+export const fonts = [
+  "Arial",
+  "Arial Black",
+  "Verdana",
+  "Helvetica",
+  "Tahoma",
+  "Impact",
 ];
 
 export type ActiveTool =
@@ -45,12 +55,28 @@ export type BuildEditorProps = {
   strokeColor: string;
   strokeWidth: number;
   selectedObjects: fabric.Object[];
+  strokeDashArray: number[];
+  fontFamily: string;
+  setStrokeDashArray: (value: number[]) => void;
   setFillColor: (value: string) => void;
   setStrokeColor: (value: string) => void;
   setStrokeWidth: (value: number) => void;
+  setFontFamily: (value: string) => void;
 };
 
 export interface Editor {
+  changeTextAlign: (value: string) => void;
+  getActiveTextAlign: () => string;
+  changeFontUnderline: (value: boolean) => void;
+  getActiveFontUnderline: () => boolean;
+  changeFontLinethrough: (value: boolean) => void;
+  getActiveFontLinethrough: () => boolean;
+  changeFontStyle: (value: string) => void;
+  getActiveFontStyle: () => string;
+  changeFontWeight: (value: number) => void;
+  getActiveFontWeight: () => number;
+  getActiveFontFamily: () => string;
+  changeFontFamily: (value: string) => void;
   addCircle: () => void;
   addSoftRectangle: () => void;
   addRectangle: () => void;
@@ -60,6 +86,7 @@ export interface Editor {
   changeFillColor: (value: string) => void;
   changeStrokeWidth: (value: number) => void;
   changeStrokeColor: (value: string) => void;
+  changeStrokeDashArray: (value: number[]) => void;
   canvas: fabric.Canvas;
   fillColor: string;
   strokeColor: string;
@@ -68,6 +95,13 @@ export interface Editor {
   // not working some bug fix it later
   // getActiveFillColor: () => string;
   getActiveStrokeColor: () => string;
+  getActiveStrokeWidth: () => number;
+  getActiveStrokeDashArray: () => number[];
+  bringForward: () => void;
+  sendBackwards: () => void;
+  changeOpacity: (value: number) => void;
+  getActiveOpacity: () => void;
+  addText: (value: string, options?: ITextboxOptions) => void;
 }
 
 export interface EditorHookProps {
@@ -77,6 +111,10 @@ export interface EditorHookProps {
 export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
 export const STROKE_WIDTH = 2;
+export const STROKE_DASH_ARRAY = [];
+export const FONT_FAMILY = "Arial";
+export const FONT_SIZE = 32;
+export const FONT_WEIGHT = 400;
 
 export const CIRCLE_OPTIONS = {
   radius: 225,
@@ -118,6 +156,15 @@ export const TRIANGLE_OPTIONS = {
   width: 400,
   height: 400,
   angle: 0,
+};
+
+export const TEXT_OPTIONS = {
+  type: "textbox",
+  left: 100,
+  top: 100,
+  fill: FILL_COLOR,
+  fontSize: FONT_SIZE,
+  fontFamily: FONT_FAMILY,
 };
 
 export const selectionDependentTools = [
