@@ -6,7 +6,7 @@ import ToolSidebarClose from "./tool-sidebar-close";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
-interface FontSidebarSidebarProps {
+interface FontSidebarProps {
   editor: Editor | undefined;
   activeTool: ActiveTool;
   onChangeActiveTool: (tool: ActiveTool) => void;
@@ -16,7 +16,7 @@ const FontSidebar = ({
   editor,
   activeTool,
   onChangeActiveTool,
-}: FontSidebarSidebarProps) => {
+}: FontSidebarProps) => {
   const value = editor?.getActiveFontFamily();
 
   const onClose = () => {

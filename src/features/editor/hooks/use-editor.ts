@@ -9,6 +9,7 @@ import {
   EditorHookProps,
   FILL_COLOR,
   FONT_FAMILY,
+  FONT_SIZE,
   FONT_WEIGHT,
   RECTANGLE_OPTIONS,
   STROKE_COLOR,
@@ -55,6 +56,27 @@ const buildEditor = ({
     canvas.setActiveObject(object);
   };
   return {
+    addImage: (value: string) => {
+      fabric.Image.fromURL(
+        value,
+        (image) => {
+          const workspace = getWorkSpace();
+
+          image.scaleToWidth(workspace?.width || 0);
+          image.scaleToHeight(workspace?.height || 0);
+
+          addToCanvas(image);
+        },
+        {
+          crossOrigin: "anonymous",
+        }
+      )
+    },
+    delete: () => {
+      canvas.getActiveObjects().forEach((object) => canvas.remove(object));
+      canvas.discardActiveObject();
+      canvas.renderAll();
+    },
     addText: (value, options) => {
       const object = new fabric.Textbox(value, {
         ...TEXT_OPTIONS,
@@ -79,6 +101,29 @@ const buildEditor = ({
         object.set({ opacity: value });
       });
       canvas.renderAll();
+    },
+    changeFontSize: (value: number) => {
+      canvas.getActiveObjects().forEach((object) => {
+        if (isTextType(object.type)) {
+          // @ts-ignore
+          // faulty TS library, underline exists
+          object.set({ fontSize: value });
+        }
+      });
+      canvas.renderAll();
+    },
+    getActiveFontSize: () => {
+      const selectedObject = selectedObjects[0];
+
+      if (!selectedObject) {
+        return FONT_SIZE;
+      }
+
+      // @ts-ignore
+      // faulty TS library, underline exists
+      const value = selectedObject.get("fontSize") || FONT_SIZE;
+
+      return value;
     },
     changeTextAlign: (value: string) => {
       canvas.getActiveObjects().forEach((object) => {

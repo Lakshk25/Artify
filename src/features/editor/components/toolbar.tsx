@@ -1,4 +1,4 @@
-import { ActiveTool, Editor, FONT_WEIGHT } from "../types";
+import { ActiveTool, Editor, FONT_SIZE, FONT_WEIGHT } from "../types";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,11 +11,13 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
+  Trash,
 } from "lucide-react";
 import { isTextType } from "../utils";
 import { FaBold } from "react-icons/fa6";
 import { useState } from "react";
 import { FaItalic, FaStrikethrough, FaUnderline } from "react-icons/fa";
+import FontSizeInput from "./font-size-input";
 
 interface ToolbarProps {
   editor: Editor | undefined;
@@ -32,6 +34,7 @@ const Toolbar = ({ editor, activeTool, onChangeActiveTool }: ToolbarProps) => {
   const initialFontLinethrough = editor?.getActiveFontLinethrough() || false;
   const initialFontUnderline = editor?.getActiveFontUnderline() || false;
   const initialTextAlign = editor?.getActiveTextAlign() || false;
+  const initialFontSize = editor?.getActiveFontSize() || FONT_SIZE;
 
   const [properties, setProperties] = useState({
     fillColor: initialFillColor,
@@ -42,12 +45,27 @@ const Toolbar = ({ editor, activeTool, onChangeActiveTool }: ToolbarProps) => {
     fontLinethrough: initialFontLinethrough,
     fontUnderline: initialFontUnderline,
     textAlign: initialTextAlign,
+    fontSize: initialFontSize,
   });
 
   const selectedObject = editor?.selectedObjects[0];
   const selectedObjectType = editor?.selectedObjects[0]?.type;
 
   const isText = isTextType(selectedObjectType);
+
+  const onChangeFontSize = (value: number) => {
+    if (!selectedObject) {
+      return;
+    }
+    if (value <= 0 || isNaN(value)) {
+      value = 1;
+    }
+    editor?.changeFontSize(value);
+    setProperties((current) => ({
+      ...current,
+      fontSize: value,
+    }));
+  };
 
   const onChangeTextAlign = (value: string) => {
     if (!selectedObject) {
@@ -300,6 +318,15 @@ const Toolbar = ({ editor, activeTool, onChangeActiveTool }: ToolbarProps) => {
         </div>
       )}
 
+      {isText && (
+        <div className="flex items-center h-full justify-center">
+          <FontSizeInput
+            value={properties.fontSize}
+            onChange={onChangeFontSize}
+          />
+        </div>
+      )}
+
       <div className="flex items-center h-full justify-center">
         <Hint label="Bring forward" side="bottom" sideOffset={5}>
           <Button
@@ -333,6 +360,14 @@ const Toolbar = ({ editor, activeTool, onChangeActiveTool }: ToolbarProps) => {
             className={cn(activeTool === "opacity" && "bg-gray-100")}
           >
             <RxTransparencyGrid className="size-4" />
+          </Button>
+        </Hint>
+      </div>
+
+      <div className="flex items-center h-full justify-center">
+        <Hint label="Delete" side="bottom" sideOffset={5}>
+          <Button onClick={() => editor?.delete()} size="icon" variant="ghost">
+            <Trash className="size-4" />
           </Button>
         </Hint>
       </div>
