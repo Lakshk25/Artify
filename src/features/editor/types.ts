@@ -32,6 +32,16 @@ export const fonts = [
   "Impact",
 ];
 
+export const filters = [
+  "none",
+  "polaroid",
+  "sepia",
+  "kodachrome",
+  "contrast",
+  "brightness",
+  "blacknwhite",
+]
+
 export type ActiveTool =
   | "select"
   | "shapes"
@@ -65,6 +75,7 @@ export type BuildEditorProps = {
 };
 
 export interface Editor {
+  changeImageFilter: (value: string) => void;
   addImage: (value: string) => void;
   delete: () => void;
   changeFontSize: (value: number) => void;
