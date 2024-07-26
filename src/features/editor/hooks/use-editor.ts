@@ -20,6 +20,7 @@ import {
 } from "../types";
 import { useCanvasEvents } from "./use-canvas-events";
 import { createFilter, isTextType } from "../utils";
+import { useClipboard } from "./use-clipboard";
 
 const buildEditor = ({
   canvas,
@@ -34,6 +35,7 @@ const buildEditor = ({
   strokeDashArray,
   setStrokeDashArray,
   setFontFamily,
+  autoZoom,
 }: BuildEditorProps): Editor => {
   const getWorkSpace = () => {
     return canvas.getObjects().find((object) => object.name === "clip");
@@ -56,6 +58,47 @@ const buildEditor = ({
     canvas.setActiveObject(object);
   };
   return {
+    autoZoom,
+    zoomIn: () => {
+      let zoomRatio = canvas.getZoom();
+      zoomRatio += 0.05;
+      const center = canvas.getCenter();
+      canvas.zoomToPoint(new fabric.Point(center.left, center.top), zoomRatio);
+    },
+    zoomOut: () => {
+      let zoomRatio = canvas.getZoom();
+      zoomRatio -= 0.05;
+      const center = canvas.getCenter();
+      canvas.zoomToPoint(
+        new fabric.Point(center.left, center.top),
+        zoomRatio < 0.2 ? 0.2 : zoomRatio
+      );
+    },
+    getWorkSpace,
+    changeSize: (value: { width: number; height: number }) => {
+      const workspace = getWorkSpace();
+
+      workspace?.set(value);
+      autoZoom();
+      // TODO: save
+    },
+    changeBackground: (value: string) => {
+      const workspace = getWorkSpace();
+      workspace?.set({ fill: value });
+      canvas?.renderAll();
+    },
+    enableDrawingMode: () => {
+      canvas.discardActiveObject();
+      canvas.renderAll();
+      canvas.isDrawingMode = true;
+      canvas.freeDrawingBrush.width = strokeWidth;
+      canvas.freeDrawingBrush.color = strokeColor;
+    },
+    disableDrawingMode: () => {
+      canvas.isDrawingMode = false;
+    },
+    onCopy: () => {},
+    onPaste: () => {},
     changeImageFilter: (value: string) => {
       const objects = canvas.getActiveObjects();
       objects.forEach((object) => {
@@ -285,6 +328,7 @@ const buildEditor = ({
         }
         object.set({ stroke: value });
       });
+      canvas.freeDrawingBrush.color = value;
       canvas.renderAll();
     },
     changeStrokeWidth: (value: number) => {
@@ -292,6 +336,7 @@ const buildEditor = ({
       canvas.getActiveObjects().forEach((object) => {
         object.set({ strokeWidth: value });
       });
+      canvas.freeDrawingBrush.width = value;
       canvas.renderAll();
     },
     changeStrokeDashArray: (value: number[]) => {
@@ -466,6 +511,13 @@ export const useEditor = ({ clearSelectionCallback }: EditorHookProps) => {
   const [strokeDashArray, setStrokeDashArray] =
     useState<number[]>(STROKE_DASH_ARRAY);
 
+  const { copy, paste } = useClipboard({ canvas });
+
+  const { autoZoom } = useAutoResize({
+    canvas,
+    container,
+  });
+
   useAutoResize({
     canvas,
     container,
@@ -481,6 +533,9 @@ export const useEditor = ({ clearSelectionCallback }: EditorHookProps) => {
   const editor = useMemo(() => {
     if (canvas) {
       return buildEditor({
+        autoZoom,
+        copy,
+        paste,
         canvas,
         fillColor,
         strokeWidth,
@@ -505,6 +560,9 @@ export const useEditor = ({ clearSelectionCallback }: EditorHookProps) => {
     strokeDashArray,
     fontFamily,
     setFontFamily,
+    autoZoom,
+    copy,
+    paste,
   ]);
   const init = useCallback(
     ({
